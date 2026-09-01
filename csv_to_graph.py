@@ -1,11 +1,19 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+# 目盛りを打つ位置を、指定した数の倍数にするためのクラス
+from matplotlib.ticker import MultipleLocator
 # ラベルのフォントサイズ
 LABEL_FONTSIZE = 16
 # メモリのフォントサイズ
 TICK_FONTSIZE = 17
+# # 散布図の軸の範囲と目盛り間隔（データを変えても固定したいのでここで指定）
+# TIME_YMAX = 20000
+# TIME_YSTEP = 2500
+# TOKENS_YMAX = 16000
+# 2000の倍数をメモリにする
+# TOKENS_YSTEP = 2000
 
-input_csv = pd.read_csv("petting_test2.csv")
+input_csv = pd.read_csv("petting_test_compressed3.csv")
 
 trial = input_csv[input_csv.keys()[0]]
 time = input_csv[input_csv.keys()[1]]
@@ -27,20 +35,22 @@ fig_scatter, ax_scatter = plt.subplots()
 ax_scatter.set_xlabel(input_csv.keys()[0], fontsize=LABEL_FONTSIZE)
 ax_scatter.set_ylabel("response time(ms)", fontsize=LABEL_FONTSIZE)
 ax_scatter.tick_params(axis="both", labelsize=TICK_FONTSIZE)
-ax_scatter.set_ylim(0,20000)
+ax_scatter.set_ylim(0, TIME_YMAX)
+ax_scatter.yaxis.set_major_locator(MultipleLocator(TIME_YSTEP))
 scatter_plot = ax_scatter.scatter(trial, time , s=10, label="response time(ms)")
 
 # 右側の軸にトークン数の折れ線グラフを重ねる
 ax_tokens = ax_scatter.twinx()
 ax_tokens.set_ylabel(input_csv.keys()[9], fontsize=LABEL_FONTSIZE)
 ax_tokens.tick_params(axis="y", labelsize=TICK_FONTSIZE)
-ax_tokens.set_ylim(0, 229966)
+ax_tokens.set_ylim(0, TOKENS_YMAX)
+ax_tokens.yaxis.set_major_locator(MultipleLocator(TOKENS_YSTEP))
 token_line, = ax_tokens.plot(trial, total_tokens, color="tab:orange", linewidth=1.5, label=input_csv.keys()[9])
 
 # 最後のデータ点の値を右軸に目盛りとして追加
-last_x = trial.iloc[-1]
-last_token = total_tokens.iloc[-1]
-ax_tokens.set_yticks(list(ax_tokens.get_yticks()) + [last_token])
+# last_x = trial.iloc[-1]
+# last_token = total_tokens.iloc[-1]
+# ax_tokens.set_yticks(list(ax_tokens.get_yticks()) + [last_token])
 
 ax_scatter.legend(handles=[scatter_plot, token_line], loc="upper left")
 
